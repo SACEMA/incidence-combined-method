@@ -9,11 +9,11 @@
 # details.  You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
- setwd("~/dev/incidence-kzn/")
-  library(feather); library(haven); library(dplyr); library(inctools);
-  library(glm2); library(parallel); library(doParallel); library(foreach);
-  library(readxl); library(stringr); library(lubridate); library(tidyr);
-  library(survey); library(import); library(abind);
+setwd("~/dev/incidence-kzn/")
+library(feather); library(haven); library(dplyr); library(inctools);
+library(glm2); library(parallel); library(doParallel); library(foreach);
+library(readxl); library(stringr); library(lubridate); library(tidyr);
+library(survey); library(import); library(abind);
 
 kzn <- read_feather("kzn.feather")
 mortality_table <- read_feather("mortality_table.feather")
@@ -43,8 +43,8 @@ load("bs_params_b1535.RData")
 
 
 ### *** FRR sensitivity analysis *** ###
-  n_bootstraps <- 10000 # 100
-  cores <- 4
+n_bootstraps <- 10000 # 100
+cores <- 4
 
 # Standard parameters
 
@@ -60,28 +60,28 @@ RSE_FRR <- 0.5
 incidences_frr_sens <- read_feather("incidences_frr_sens_empty.feather")
 for (frr_iterate in FRRs) {
   # Women 15-35
- incarray_w1535 <- extract_incidences(params = bs_params_w1535, 
-                                      lambda = 0, 
-                                      mort.spline = mort.spline.f, 
-                                      age.range = c(15,35), 
-                                      age.step = 1, 
-                                      cores = cores, 
-                                      mdri = mdriYr, 
-                                      frr = frr_iterate, 
-                                      bigT = 2)
- inc_w1535 <- incidence(data = kzn, 
-                           sex = "Female", 
-                           age.range = c(15,35), 
-                           incmat = incarray_w1535, 
-                           lambda = 0, 
-                           mort.spline = mort.spline.f,
-                           mdri = mdriYr, 
-                           rse_mdri = rse_mdri,
-                           frr = frr_iterate, 
-                           rse_frr = RSE_FRR,
-                           bigT = 2, 
-                           alpha = 0.05, 
-                        debug = FALSE)
+  incarray_w1535 <- extract_incidences(params = bs_params_w1535, 
+                                       lambda = 0, 
+                                       mort.spline = mort.spline.f, 
+                                       age.range = c(15,35), 
+                                       age.step = 1, 
+                                       cores = cores, 
+                                       mdri = mdriYr, 
+                                       frr = frr_iterate, 
+                                       bigT = 2)
+  inc_w1535 <- incidence(data = kzn, 
+                         sex = "Female", 
+                         age.range = c(15,35), 
+                         incmat = incarray_w1535, 
+                         lambda = 0, 
+                         mort.spline = mort.spline.f,
+                         mdri = mdriYr, 
+                         rse_mdri = rse_mdri,
+                         frr = frr_iterate, 
+                         rse_frr = RSE_FRR,
+                         bigT = 2, 
+                         alpha = 0.05, 
+                         debug = FALSE)
   
   inc_w1535$IncPrev.LB <- inc_w1535$IncPrev - qnorm(1-(0.05/2))*inc_w1535$IncPrev.sigma
   inc_w1535$IncPrev.LB <- ifelse(inc_w1535$IncPrev.LB<0,0,inc_w1535$IncPrev.LB)
@@ -170,7 +170,7 @@ for (frr_iterate in FRRs) {
   
   inc_b1535$Sex <- "Both"
   inc_b1535$FRR <- frr_iterate
- 
+  
   #save(incarray_b1535, file = paste0("incarray_b1535_FRR_",frr_iterate,".RData"))
   #write_feather(inc_b1535, paste0("inc_b1535_FRR_",frr_iterate,".feather"))
   

@@ -9,14 +9,14 @@
 # details.  You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  setwd("~/dev/incidence-kzn/")
-  library(feather); library(haven); library(dplyr); library(inctools);
-  library(glm2); library(parallel); library(doParallel); library(foreach);
-  library(readxl); library(stringr); library(lubridate); library(tidyr);
-  library(survey); library(import); library(abind);
+setwd("~/dev/incidence-kzn/")
+library(feather); library(haven); library(dplyr); library(inctools);
+library(glm2); library(parallel); library(doParallel); library(foreach);
+library(readxl); library(stringr); library(lubridate); library(tidyr);
+library(survey); library(import); library(abind);
 
-  cores <- 4
-  
+cores <- 4
+
 kzn <- read_feather("kzn.feather")
 
 
@@ -51,25 +51,25 @@ frrContext <- 0.00166780137766038
 rse_frrContext <- 0.465416630819573
 
 # Women 15-35
-  bs_params_w1535 <- bootstrap_params(data = kzn, sex = "Female", age.range = c(15,35), n_bootstraps = 12500, cores = cores)
-  incarray_w1535 <- extract_incidences(params = bs_params_w1535, deriv_t = 0, 
-                                       mort.spline = mort.spline.f, 
-                                       age.range = c(15,35), age.step = 0.25, 
-                                       cores = cores, mdri = mdriYr, 
-                                       frr = frrContext, bigT = 2)
+bs_params_w1535 <- bootstrap_params(data = kzn, sex = "Female", age.range = c(15,35), n_bootstraps = 12500, cores = cores)
+incarray_w1535 <- extract_incidences(params = bs_params_w1535, deriv_t = 0, 
+                                     mort.spline = mort.spline.f, 
+                                     age.range = c(15,35), age.step = 0.25, 
+                                     cores = cores, mdri = mdriYr, 
+                                     frr = frrContext, bigT = 2)
 
-  inc_w1535 <- incidence(data = kzn, 
-                         sex = "Female", 
-                         age.range = c(15,35), 
-                         incmat = incarray_w1535, 
-                         deriv_t = 0, 
-                         mort.spline = mort.spline.f,
-                         mdri = mdriYr, 
-                         rse_mdri = rse_mdri,
-                         frr = frrContext, 
-                         rse_frr = rse_frrContext,
-                         bigT = 2, 
-                         alpha = 0.05, debug = FALSE)
+inc_w1535 <- incidence(data = kzn, 
+                       sex = "Female", 
+                       age.range = c(15,35), 
+                       incmat = incarray_w1535, 
+                       deriv_t = 0, 
+                       mort.spline = mort.spline.f,
+                       mdri = mdriYr, 
+                       rse_mdri = rse_mdri,
+                       frr = frrContext, 
+                       rse_frr = rse_frrContext,
+                       bigT = 2, 
+                       alpha = 0.05, debug = FALSE)
 
 
 

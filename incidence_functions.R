@@ -152,7 +152,7 @@ extract_incidences <- function(params, deriv_t = 0, mort.spline,
                                  if (i %in% gc_iterations) {gc()}
                                  if(!exists("pb")) pb <- utils::txtProgressBar(min = 1, max = n, style = 3)
                                  iterate_mat <- matrix(nrow = length(ages), ncol = 4)
-
+                                 
                                  iterate_mat[,1] <- P(t = ages, parameters = unname(as.matrix(params[i,1:4])))
                                  
                                  iterate_mat[,2] <- (1/(1-iterate_mat[,1])) * (dPda(t = ages, parameters = unname(as.matrix(params[i,1:4]))) + dPdt(a = ages, deriv = deriv_t)) + # (1/(1-p(a))) * (dPda + dPdt)
