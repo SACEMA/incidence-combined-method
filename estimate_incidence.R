@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Eduard Grebe, Alex Welte and Stellenbosch University
+# Copyright (C) 2018 Eduard Grebe and Stellenbosch University
 #
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -9,14 +9,22 @@
 # details.  You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-setwd("~/dev/incidence-kzn/")
+# modify this line to the path of the repository on your system
+path <- "~/dev/incidence-kzn/"
+
+setwd(path)
+
+# Make sure all required packages are installed
 library(feather); library(haven); library(dplyr); library(inctools);
 library(glm2); library(parallel); library(doParallel); library(foreach);
 library(readxl); library(stringr); library(lubridate); library(tidyr);
 library(survey); library(import); library(abind);
 
+# modify this to the number of cores available on your system
 cores <- 4
 
+# This is the full dataset we utilised. Modifications to this line as well as
+# to variables referenced in the code would be required in order to
 kzn <- read_feather("kzn.feather")
 
 
@@ -52,23 +60,23 @@ rse_frrContext <- 0.465416630819573
 
 # Women 15-35
 bs_params_w1535 <- bootstrap_params(data = kzn, sex = "Female", age.range = c(15,35), n_bootstraps = 12500, cores = cores)
-incarray_w1535 <- extract_incidences(params = bs_params_w1535, deriv_t = 0, 
-                                     mort.spline = mort.spline.f, 
-                                     age.range = c(15,35), age.step = 0.25, 
-                                     cores = cores, mdri = mdriYr, 
+incarray_w1535 <- extract_incidences(params = bs_params_w1535, deriv_t = 0,
+                                     mort.spline = mort.spline.f,
+                                     age.range = c(15,35), age.step = 0.25,
+                                     cores = cores, mdri = mdriYr,
                                      frr = frrContext, bigT = 2)
 
-inc_w1535 <- incidence(data = kzn, 
-                       sex = "Female", 
-                       age.range = c(15,35), 
-                       incmat = incarray_w1535, 
-                       deriv_t = 0, 
+inc_w1535 <- incidence(data = kzn,
+                       sex = "Female",
+                       age.range = c(15,35),
+                       incmat = incarray_w1535,
+                       deriv_t = 0,
                        mort.spline = mort.spline.f,
-                       mdri = mdriYr, 
+                       mdri = mdriYr,
                        rse_mdri = rse_mdri,
-                       frr = frrContext, 
+                       frr = frrContext,
                        rse_frr = rse_frrContext,
-                       bigT = 2, 
+                       bigT = 2,
                        alpha = 0.05, debug = FALSE)
 
 
@@ -82,16 +90,16 @@ inc_w1535$IncR.LB <- inc_w1535$IncR - qnorm(1-(0.05/2))*inc_w1535$IncR.sigma
 inc_w1535$IncR.LB <- ifelse(inc_w1535$IncR.LB<0,0,inc_w1535$IncR.LB)
 inc_w1535$IncR.UB <- inc_w1535$IncR + qnorm(1-(0.05/2))*inc_w1535$IncPrev.sigma
 
-inc_w1535_long <- data_frame(Age = rep(inc_w1535$Age,3), 
+inc_w1535_long <- data_frame(Age = rep(inc_w1535$Age,3),
                              Estimate = factor(c(rep("Incidence (synthetic cohort)",nrow(inc_w1535)),
                                                  rep("Incidence (biomarker)",nrow(inc_w1535)),
-                                                 rep("Weighted average",nrow(inc_w1535)))), 
+                                                 rep("Weighted average",nrow(inc_w1535)))),
                              Incidence = c(inc_w1535$IncPrev,
                                            inc_w1535$IncR,
-                                           inc_w1535$IncW), 
+                                           inc_w1535$IncW),
                              LB = c(inc_w1535$IncPrev.LB,
                                     inc_w1535$IncR.LB,
-                                    inc_w1535$IncW.LB), 
+                                    inc_w1535$IncW.LB),
                              UB = c(inc_w1535$IncPrev.UB,
                                     inc_w1535$IncR.UB,
                                     inc_w1535$IncW.UB)
@@ -111,17 +119,17 @@ write_feather(women_summary, "women_summary.feather")
 # Men 15-35
 bs_params_m1535 <- bootstrap_params(data = kzn, sex = "Male", age.range = c(15,35), n_bootstraps = 12500, cores = cores)
 incarray_m1535 <- extract_incidences(params = bs_params_m1535, deriv_t = 0, mort.spline = mort.spline.m, age.range = c(15,35), age.step = 0.25, cores = cores, mdri = mdriYr, frr = frrContext, bigT = 2)
-inc_m1535 <- incidence(data = kzn, 
-                       sex = "Male", 
-                       age.range = c(15,35), 
+inc_m1535 <- incidence(data = kzn,
+                       sex = "Male",
+                       age.range = c(15,35),
                        mort.spline = mort.spline.m,
-                       incmat = incarray_m1535, 
-                       deriv_t = 0, 
-                       mdri = mdriYr, 
+                       incmat = incarray_m1535,
+                       deriv_t = 0,
+                       mdri = mdriYr,
                        rse_mdri = rse_mdri,
-                       frr = frrContext, 
+                       frr = frrContext,
                        rse_frr = rse_frrContext,
-                       bigT = 2, 
+                       bigT = 2,
                        alpha = 0.05)
 
 inc_m1535$IncPrev.LB <- inc_m1535$IncPrev - qnorm(1-(0.05/2))*inc_m1535$IncPrev.sigma
@@ -132,16 +140,16 @@ inc_m1535$IncR.LB <- inc_m1535$IncR - qnorm(1-(0.05/2))*inc_m1535$IncR.sigma
 inc_m1535$IncR.LB <- ifelse(inc_m1535$IncR.LB<0,0,inc_m1535$IncR.LB)
 inc_m1535$IncR.UB <- inc_m1535$IncR + qnorm(1-(0.05/2))*inc_m1535$IncPrev.sigma
 
-inc_m1535_long <- data_frame(Age = rep(inc_m1535$Age,3), 
+inc_m1535_long <- data_frame(Age = rep(inc_m1535$Age,3),
                              Estimate = factor(c(rep("Incidence (synthetic cohort)",nrow(inc_m1535)),
                                                  rep("Incidence (biomarker)",nrow(inc_m1535)),
-                                                 rep("Weighted average",nrow(inc_m1535)))), 
+                                                 rep("Weighted average",nrow(inc_m1535)))),
                              Incidence = c(inc_m1535$IncPrev,
                                            inc_m1535$IncR,
-                                           inc_m1535$IncW), 
+                                           inc_m1535$IncW),
                              LB = c(inc_m1535$IncPrev.LB,
                                     inc_m1535$IncR.LB,
-                                    inc_m1535$IncW.LB), 
+                                    inc_m1535$IncW.LB),
                              UB = c(inc_m1535$IncPrev.UB,
                                     inc_m1535$IncR.UB,
                                     inc_m1535$IncW.UB)
@@ -159,17 +167,17 @@ write_feather(men_summary, "men_summary.feather")
 # All 15-35
 bs_params_b1535 <- bootstrap_params(data = kzn, sex = "both", age.range = c(15,35), n_bootstraps = 12500, cores = cores)
 incarray_b1535 <- extract_incidences(params = bs_params_b1535, deriv_t = 0, mort.spline = mort.spline.b, age.range = c(15,35), age.step = 0.25, cores = cores, mdri = mdriYr, frr = frrContext, bigT = 2)
-inc_b1535 <- incidence(data = kzn, 
-                       sex = "both", 
-                       age.range = c(15,35), 
+inc_b1535 <- incidence(data = kzn,
+                       sex = "both",
+                       age.range = c(15,35),
                        mort.spline = mort.spline.m,
-                       incmat = incarray_b1535, 
-                       deriv_t = 0, 
-                       mdri = mdriYr, 
+                       incmat = incarray_b1535,
+                       deriv_t = 0,
+                       mdri = mdriYr,
                        rse_mdri = rse_mdri,
-                       frr = frrContext, 
+                       frr = frrContext,
                        rse_frr = rse_frrContext,
-                       bigT = 2, 
+                       bigT = 2,
                        alpha = 0.05)
 
 inc_b1535$IncPrev.LB <- inc_b1535$IncPrev - qnorm(1-(0.05/2))*inc_b1535$IncPrev.sigma
@@ -180,16 +188,16 @@ inc_b1535$IncR.LB <- inc_b1535$IncR - qnorm(1-(0.05/2))*inc_b1535$IncR.sigma
 inc_b1535$IncR.LB <- ifelse(inc_b1535$IncR.LB<0,0,inc_b1535$IncR.LB)
 inc_b1535$IncR.UB <- inc_b1535$IncR + qnorm(1-(0.05/2))*inc_b1535$IncPrev.sigma
 
-inc_b1535_long <- data_frame(Age = rep(inc_b1535$Age,3), 
+inc_b1535_long <- data_frame(Age = rep(inc_b1535$Age,3),
                              Estimate = factor(c(rep("Incidence (synthetic cohort)",nrow(inc_b1535)),
                                                  rep("Incidence (biomarker)",nrow(inc_b1535)),
-                                                 rep("Weighted average",nrow(inc_b1535)))), 
+                                                 rep("Weighted average",nrow(inc_b1535)))),
                              Incidence = c(inc_b1535$IncPrev,
                                            inc_b1535$IncR,
-                                           inc_b1535$IncW), 
+                                           inc_b1535$IncW),
                              LB = c(inc_b1535$IncPrev.LB,
                                     inc_b1535$IncR.LB,
-                                    inc_b1535$IncW.LB), 
+                                    inc_b1535$IncW.LB),
                              UB = c(inc_b1535$IncPrev.UB,
                                     inc_b1535$IncR.UB,
                                     inc_b1535$IncW.UB)
