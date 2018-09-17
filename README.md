@@ -3,6 +3,8 @@
 Analytical code for estimating incidence using a combination of synthetic cohort
 and recency biomarker-based approaches.
 
+[![DOI](https://zenodo.org/badge/143841366.svg)](https://zenodo.org/badge/latestdoi/143841366)
+
 ## Published article
 
 The approach and methodology implemented in this code is described in the following article:
